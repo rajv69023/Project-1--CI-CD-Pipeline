@@ -20,14 +20,22 @@ node {
   
     stage('Build Project') {
       // build project via maven
-      sh "'${mvnHome}/bin/mvn' clean install -U"
-
+      sh "'${mvnHome}/bin/mvn' clean install"
     }
 		
     stage('Build Docker Image') {
-      // build docker image
-      dockerImage = docker.build("devopsexample:${env.BUILD_NUMBER}")
-    }
+    // Optional: create index.html dynamically
+    sh '''
+    cat <<EOF > index.html
+    <html>
+      <head><title>My App</title></head>
+      <body><h1>Hello from Jenkins Pipeline!</h1></body>
+    </html>
+    EOF
+    '''
+
+    dockerImage = docker.build("devopsexample:${env.BUILD_NUMBER}")
+}
    	  
     stage('Deploy Docker Image and login'){
       
@@ -42,9 +50,7 @@ node {
 	// sh "docker images | awk '{print $3}' | awk 'NR==2'"
 	//sh echo "Enter the docker lattest imageID"
 	//sh "read imageid"
-	   sh "docker tag 7be0e70ce3eb  rajv690/myapplication" //must change your name and tag no
-        sh "docker push rajv690/myapplication:latest"
+	   sh "docker tag f2415fc858f4  rajv690/myapplication1" //must change your name and tag no
+        sh "docker push   rajv690/myapplication:latest"
   }
-
-  }
-
+}
