@@ -37,13 +37,14 @@ node {
         sh "docker login -u rajv690 -p Rocky69023" // put PWD
 	
 }
-    stage('Docker push') {
-    sh "docker tag devopsexample:${env.BUILD_NUMBER} rajv690/myapplication:${env.BUILD_NUMBER}"
-    sh "docker tag devopsexample:${env.BUILD_NUMBER} rajv690/myapplication:latest"
-    
-    sh "docker push rajv690/myapplication:${env.BUILD_NUMBER}"
-    sh "docker push rajv690/myapplication:latest"
-}
+    stage('Docker push'){
+       // docker images | awk '{print $3}' | awk 'NR==2'
+	// sh "docker images | awk '{print $3}' | awk 'NR==2'"
+	//sh echo "Enter the docker lattest imageID"
+	//sh "read imageid"
+	   sh "docker tag 717b9f6cec8d  rajv690/myapplication" //must change your name and tag no
+        sh "docker push rajv690/myapplication:tagname"
+  }
 
   }
 
