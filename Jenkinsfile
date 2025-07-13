@@ -1,31 +1,35 @@
 node {
-    def mvnHome = tool 'maven-3.5.2'  // Make sure this tool is configured in Jenkins
-    def dockerImageTag = "vickeyyvickey/myapplication:${env.BUILD_NUMBER}"
+    def mvnHome = tool 'maven-3.5.2' // Ensure this is configured in Jenkins
+    def dockerImageTag = "rajv690/myapplication:${env.BUILD_NUMBER}"
 
-    stage('Clone Repo') {
+    stage('Clone Repository') {
         git 'https://github.com/vikas4cloud/CI-CD-java-maven-docker.git'
     }
 
-    stage('Build Project') {
+    stage('Build Maven Project') {
         sh "${mvnHome}/bin/mvn clean install"
     }
 
     stage('Build Docker Image') {
-        // Force rebuild Docker image with no cache
+        // Rebuild Docker image with no cache to ensure latest code is included
         sh "docker build --no-cache -t ${dockerImageTag} ."
     }
 
-    stage('Docker Login & Push') {
-        // Replace with Jenkins credentials for secure login
-        withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-            sh 'echo "$DOCKER_PASS" | docker login -u rajv690 -p Rocky69023'
-        }
+    stage('Docker Login') {
+        // WARNING: Hardcoded credentials, okay for learning/testing only
+        sh 'docker login -u rajv690 -p Rocky69023'
+    }
 
-        // Push with versioned tag
+    stage('Push Docker Image') {
+        // Push versioned image
         sh "docker push ${dockerImageTag}"
 
-        // Also push as 'latest' if needed
+        // Also push 'latest' tag (optional but common)
         sh "docker tag ${dockerImageTag} rajv690/myapplication:latest"
         sh "docker push rajv690/myapplication:latest"
+    }
+
+    stage('Cleanup') {
+        echo "Docker image ${dockerImageTag} successfully built and pushed."
     }
 }
